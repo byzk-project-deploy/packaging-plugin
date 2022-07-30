@@ -69,7 +69,11 @@ func Packing(src, target string) error {
 	}
 	defer targetF.Close()
 
-	return PackingToWriteStream(src, targetF)
+	if err = PackingToWriteStream(src, targetF); err != nil {
+		_ = targetF.Close()
+		_ = os.RemoveAll(target)
+	}
+	return nil
 }
 
 // PackingToWriteStream 打包到输出路径
@@ -165,7 +169,13 @@ func Unpacking(packingPluginFile, targetPath string) (*rpcinterfaces.PluginInfo,
 	}
 	defer targetF.Close()
 
-	return UnpackingByStream(f, targetF)
+	if info, err := UnpackingByStream(f, targetF); err != nil {
+		_ = targetF.Close()
+		_ = os.RemoveAll(targetPath)
+		return nil, err
+	} else {
+		return info, nil
+	}
 }
 
 type wrapperMultipleReader struct {
