@@ -8,8 +8,10 @@ import (
 	"fmt"
 	rpcinterfaces "github.com/byzk-project-deploy/base-interface"
 	"github.com/go-base-lib/coderutils"
+	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
 	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -346,7 +348,8 @@ func getPluginInfoByPath(p string) (*rpcinterfaces.PluginInfo, error) {
 			MagicCookieKey:   "BASIC_PLUGIN",
 			MagicCookieValue: "hello",
 		},
-
+		Logger:  hclog.NewNullLogger(),
+		Stderr:  ioutil.Discard,
 		Plugins: pluginMap,
 		Cmd:     exec.Command(p),
 	})
