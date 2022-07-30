@@ -4,6 +4,8 @@ github.com/byzk-project-deploy/base-interface v0.0.0-20220728090748-42a8becae00f
 github.com/byzk-project-deploy/base-interface v0.0.0-20220728090748-42a8becae00f/go.mod h1:AxL5KYAh2QgAlTUpQsL4vMS3iEwiiZboImgRp6+jIhs=
 github.com/byzk-project-deploy/base-interface v0.0.0-20220730103510-2e6ba3fd9a08 h1:PQt3RLfPvTyNNKqzyJmcrOpRtZvbsV6/X029+dNuix0=
 github.com/byzk-project-deploy/base-interface v0.0.0-20220730103510-2e6ba3fd9a08/go.mod h1:uCWkxs5yhSdG4aQ7PcVVqrlOz/Oed2DdIooIMt9ioJI=
+github.com/byzk-project-deploy/base-interface v0.0.0-20220730184505-463916a55621 h1:gOi0/nHRoaOv4U/K62x+cty5nakO7jjQS0+dp1+dlNw=
+github.com/byzk-project-deploy/base-interface v0.0.0-20220730184505-463916a55621/go.mod h1:uCWkxs5yhSdG4aQ7PcVVqrlOz/Oed2DdIooIMt9ioJI=
 github.com/census-instrumentation/opencensus-proto v0.2.1/go.mod h1:f6KPmirojxKA12rnyqOA5BBL4O983OfeGPqjHWSTneU=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=

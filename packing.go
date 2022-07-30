@@ -343,21 +343,17 @@ func getPluginInfoByPath(p string) (*rpcinterfaces.PluginInfo, error) {
 	}
 
 	client := plugin.NewClient(&plugin.ClientConfig{
-		HandshakeConfig: plugin.HandshakeConfig{
-			ProtocolVersion:  1,
-			MagicCookieKey:   "BASIC_PLUGIN",
-			MagicCookieValue: "hello",
-		},
-		Logger:  hclog.NewNullLogger(),
-		Stderr:  ioutil.Discard,
-		Plugins: pluginMap,
-		Cmd:     exec.Command(p),
+		HandshakeConfig: *rpcinterfaces.DefaultHandshakeConfig,
+		Logger:          hclog.NewNullLogger(),
+		Stderr:          ioutil.Discard,
+		Plugins:         pluginMap,
+		Cmd:             exec.Command(p),
 	})
 	defer client.Kill()
 
 	rpcClient, err := client.Client()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	raw, err := rpcClient.Dispense(rpcinterfaces.PluginNameInfo)
