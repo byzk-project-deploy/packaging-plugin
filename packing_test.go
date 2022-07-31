@@ -25,7 +25,7 @@ func TestPackingAndUnpacking(t *testing.T) {
 		return
 	}
 
-	info, err := Unpacking(targetFilePath, unpackingFilePath)
+	info, targetFilePath, err := Unpacking(targetFilePath, unpackingFilePath)
 	if !a.NoError(err) {
 		return
 	}
@@ -50,5 +50,6 @@ func TestPackingAndUnpacking(t *testing.T) {
 	}
 
 	a.Equal(unpackPluginInfo, info, "解包之后的运行结果与原包不一致")
+	a.Equal(targetFilePath, unpackingFilePath)
 
 }

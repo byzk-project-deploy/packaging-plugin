@@ -155,10 +155,10 @@ func PackingToWriteStream(src string, target io.ReadWriteSeeker) error {
 	return nil
 }
 
-func Unpacking(packingPluginFile, targetPath string) (*rpcinterfaces.PluginInfo, error) {
+func Unpacking(packingPluginFile, targetPath string) (*rpcinterfaces.PluginInfo, string, error) {
 	f, err := os.OpenFile(packingPluginFile, os.O_RDONLY, 0655)
 	if err != nil {
-		return nil, fmt.Errorf("打开包装的插件文件失败: %s", err.Error())
+		return nil, "", fmt.Errorf("打开包装的插件文件失败: %s", err.Error())
 	}
 	defer f.Close()
 
@@ -204,76 +204,79 @@ func newWrapperMultipleReader(r ...io.ReadSeeker) *wrapperMultipleReader {
 	return _r
 }
 
-func UnpackingByStream(packingPluginFile io.ReadSeeker, targetPath string) (*rpcinterfaces.PluginInfo, error) {
+func UnpackingByStream(packingPluginFile io.ReadSeeker, targetPath string) (*rpcinterfaces.PluginInfo, string, error) {
 
 	lenBit := int64(4)
 
 	if _, err := packingPluginFile.Seek(-lenBit, 2); err != nil {
-		return nil, fmt.Errorf("移动文件指针失败: %s", err.Error())
+		return nil, "", fmt.Errorf("移动文件指针失败: %s", err.Error())
 	}
 
 	infoLenBytes, err := readBytesByLen(packingPluginFile, 4)
 	if err != nil {
-		return nil, fmt.Errorf("读取插件包的数据长度失败: %s", err.Error())
+		return nil, "", fmt.Errorf("读取插件包的数据长度失败: %s", err.Error())
 	}
 
 	infoLen, err := BytesToInt[int32](infoLenBytes)
 	if err != nil {
-		return nil, fmt.Errorf("转换数据长度失败: %s", err.Error())
+		return nil, "", fmt.Errorf("转换数据长度失败: %s", err.Error())
 	}
 
 	infoEndOffset := lenBit + int64(infoLen)
 
 	if _, err = packingPluginFile.Seek(-infoEndOffset, 2); err != nil {
-		return nil, fmt.Errorf("移动插件包指针失败: %s", err.Error())
+		return nil, "", fmt.Errorf("移动插件包指针失败: %s", err.Error())
 	}
 
 	infoBytes, err := readBytesByLen(packingPluginFile, int(infoLen))
 	if err != nil {
-		return nil, fmt.Errorf("读取包内插件信息失败: %s", err.Error())
+		return nil, "", fmt.Errorf("读取包内插件信息失败: %s", err.Error())
 	}
 
 	var pluginInfo *rpcinterfaces.PluginInfo
 	if err = json.Unmarshal(infoBytes, &pluginInfo); err != nil {
-		return nil, fmt.Errorf("反序列化插件信息失败: %s", err.Error())
+		return nil, "", fmt.Errorf("反序列化插件信息失败: %s", err.Error())
 	}
 
 	hashEndOffset := infoEndOffset + md5.Size + sha1.Size
 	dataStartPos, err := packingPluginFile.Seek(-hashEndOffset, 2)
 	if err != nil {
-		return nil, fmt.Errorf("移动插件包文件指针失败: %s", err.Error())
+		return nil, "", fmt.Errorf("移动插件包文件指针失败: %s", err.Error())
 	}
 
 	md5Sum, err := readBytesByLen(packingPluginFile, md5.Size)
 	if err != nil {
-		return nil, fmt.Errorf("读取MD5摘要失败")
+		return nil, "", fmt.Errorf("读取MD5摘要失败")
 	}
 
 	sha1Sum, err := readBytesByLen(packingPluginFile, sha1.Size)
 	if err != nil {
-		return nil, fmt.Errorf("读取SHA1摘要失败")
+		return nil, "", fmt.Errorf("读取SHA1摘要失败")
 	}
 
 	if _, err = packingPluginFile.Seek(0, 0); err != nil {
-		return nil, fmt.Errorf("移动插件包文件指针失败: %s", err.Error())
+		return nil, "", fmt.Errorf("移动插件包文件指针失败: %s", err.Error())
 	}
 
-	var target *os.File
+	var (
+		targetFilePath string
+	)
 	stat, err := os.Stat(targetPath)
 	if err != nil {
 		_ = os.MkdirAll(filepath.Dir(targetPath), 0755)
-		if target, err = os.OpenFile(targetPath, os.O_RDWR|os.O_CREATE, 0755); err != nil {
-			return nil, fmt.Errorf("打开目标文件失败: %s", err.Error())
-		}
+		targetFilePath = targetPath
 	} else if stat.IsDir() {
-		if target, err = os.OpenFile(filepath.Join(targetPath, pluginInfo.Name), os.O_RDWR|os.O_CREATE, 0755); err != nil {
-			return nil, fmt.Errorf("打开目标文件失败: %s", err.Error())
-		}
+		targetFilePath = filepath.Join(targetPath, pluginInfo.Name)
+	}
+
+	target, err := os.OpenFile(targetFilePath, os.O_RDWR|os.O_CREATE, 0755)
+	if err != nil {
+		return nil, "", fmt.Errorf("创建并打开目标文件文件失败: %s", err.Error())
 	}
 	defer target.Close()
 
 	if _, err = io.CopyN(target, packingPluginFile, dataStartPos); err != nil {
-		return nil, fmt.Errorf("写出插件数据失败: %s", err.Error())
+		return nil, "", fmt.Errorf("写出插件数据失败: %s", err.Error())
 	}
 
 	multipleReader := newWrapperMultipleReader(target, bytes.NewReader(bytes.Join([][]byte{
@@ -282,30 +285,30 @@ func UnpackingByStream(packingPluginFile io.ReadSeeker, targetPath string) (*rpc
 	}, nil)))
 	targetMd5Sum, err := coderutils.HashByReader(md5.New(), multipleReader)
 	if err != nil {
-		return nil, fmt.Errorf("获取目标文件的MD5摘要失败")
+		return nil, "", fmt.Errorf("获取目标文件的MD5摘要失败")
 	}
 
 	if !bytes.Equal(targetMd5Sum, md5Sum) {
-		return nil, fmt.Errorf("插件包完整性校验失败")
+		return nil, "", fmt.Errorf("插件包完整性校验失败")
 	}
 
 	if err = multipleReader.Reset(); err != nil {
-		return nil, fmt.Errorf("移动目标文件指针失败: %s", err.Error())
+		return nil, "", fmt.Errorf("移动目标文件指针失败: %s", err.Error())
 	}
 
 	targetSha1Sum, err := coderutils.HashByReader(sha1.New(), multipleReader)
 	if err != nil {
-		return nil, fmt.Errorf("获取目标文件的SHA1摘要失败")
+		return nil, "", fmt.Errorf("获取目标文件的SHA1摘要失败")
 	}
 
 	if !bytes.Equal(targetSha1Sum, sha1Sum) {
-		return nil, fmt.Errorf("插件包完整性校验失败")
+		return nil, "", fmt.Errorf("插件包完整性校验失败")
 	}
 
 	if pluginInfo.NotAllowOsAndArch != nil {
 		for i := range pluginInfo.NotAllowOsAndArch {
 			if pluginInfo.NotAllowOsAndArch[i].Is(currentOs, currentArch) {
-				return nil, fmt.Errorf("不支持在当前系统中运行")
+				return nil, "", fmt.Errorf("不支持在当前系统中运行")
 			}
 		}
 	}
@@ -319,10 +322,10 @@ func UnpackingByStream(packingPluginFile io.ReadSeeker, targetPath string) (*rpc
 	} else {
 		goto Success
 	}
-	return nil, fmt.Errorf("插件不允许在当前系统中运行")
+	return nil, "", fmt.Errorf("插件不允许在当前系统中运行")
 
 Success:
-	return pluginInfo, nil
+	return pluginInfo, targetFilePath, nil
 
 }
 
