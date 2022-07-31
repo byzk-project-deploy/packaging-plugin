@@ -162,21 +162,7 @@ func Unpacking(packingPluginFile, targetPath string) (*rpcinterfaces.PluginInfo,
 	}
 	defer f.Close()
 
-	_ = os.RemoveAll(targetPath)
-	_ = os.MkdirAll(filepath.Dir(targetPath), 0755)
-	targetF, err := os.OpenFile(targetPath, os.O_RDWR|os.O_CREATE, 0755)
-	if err != nil {
-		return nil, fmt.Errorf("打开目标文件失败: %s", err.Error())
-	}
-	defer targetF.Close()
-
-	if info, err := UnpackingByStream(f, targetF); err != nil {
-		_ = targetF.Close()
-		_ = os.RemoveAll(targetPath)
-		return nil, err
-	} else {
-		return info, nil
-	}
+	return UnpackingByStream(f, targetPath)
 }
 
 type wrapperMultipleReader struct {
@@ -218,7 +204,7 @@ func newWrapperMultipleReader(r ...io.ReadSeeker) *wrapperMultipleReader {
 	return _r
 }
 
-func UnpackingByStream(packingPluginFile io.ReadSeekCloser, target io.ReadWriteSeeker) (*rpcinterfaces.PluginInfo, error) {
+func UnpackingByStream(packingPluginFile io.ReadSeeker, targetPath string) (*rpcinterfaces.PluginInfo, error) {
 
 	lenBit := int64(4)
 
@@ -271,6 +257,20 @@ func UnpackingByStream(packingPluginFile io.ReadSeekCloser, target io.ReadWriteS
 	if _, err = packingPluginFile.Seek(0, 0); err != nil {
 		return nil, fmt.Errorf("移动插件包文件指针失败: %s", err.Error())
 	}
+
+	var target *os.File
+	stat, err := os.Stat(targetPath)
+	if err != nil {
+		_ = os.MkdirAll(filepath.Dir(targetPath), 0755)
+		if target, err = os.OpenFile(targetPath, os.O_RDWR|os.O_CREATE, 0755); err != nil {
+			return nil, fmt.Errorf("打开目标文件失败: %s", err.Error())
+		}
+	} else if stat.IsDir() {
+		if target, err = os.OpenFile(filepath.Join(targetPath, pluginInfo.Name), os.O_RDWR|os.O_CREATE, 0755); err != nil {
+			return nil, fmt.Errorf("打开目标文件失败: %s", err.Error())
+		}
+	}
+	defer target.Close()
 
 	if _, err = io.CopyN(target, packingPluginFile, dataStartPos); err != nil {
 		return nil, fmt.Errorf("写出插件数据失败: %s", err.Error())
