@@ -258,15 +258,15 @@ func UnpackingByStream(packingPluginFile io.ReadSeeker, targetPath string) (*rpc
 		return nil, "", fmt.Errorf("移动插件包文件指针失败: %s", err.Error())
 	}
 
-	var (
-		targetFilePath string
-	)
+	var targetFilePath string
 	stat, err := os.Stat(targetPath)
 	if err != nil {
 		_ = os.MkdirAll(filepath.Dir(targetPath), 0755)
 		targetFilePath = targetPath
 	} else if stat.IsDir() {
 		targetFilePath = filepath.Join(targetPath, pluginInfo.Name)
+	} else {
+		return nil, "", fmt.Errorf("文件已存在，请尝试删除后重试")
 	}
 
 	target, err := os.OpenFile(targetFilePath, os.O_RDWR|os.O_CREATE, 0755)
