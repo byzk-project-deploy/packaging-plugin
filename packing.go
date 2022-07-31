@@ -72,6 +72,7 @@ func Packing(src, target string) error {
 	if err = PackingToWriteStream(src, targetF); err != nil {
 		_ = targetF.Close()
 		_ = os.RemoveAll(target)
+		return err
 	}
 	return nil
 }
