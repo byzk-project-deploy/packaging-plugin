@@ -353,7 +353,7 @@ func getPluginInfoByPath(p string) (*rpcinterfaces.PluginInfo, error) {
 	}
 
 	pluginMap := map[string]plugin.Plugin{
-		rpcinterfaces.PluginNameInfo: &rpcinterfaces.PluginInfoImpl{},
+		rpcinterfaces.PluginNameBase: &rpcinterfaces.PluginBaseImpl{},
 	}
 
 	client := plugin.NewClient(&plugin.ClientConfig{
@@ -370,11 +370,11 @@ func getPluginInfoByPath(p string) (*rpcinterfaces.PluginInfo, error) {
 		return nil, err
 	}
 
-	raw, err := rpcClient.Dispense(rpcinterfaces.PluginNameInfo)
+	raw, err := rpcClient.Dispense(rpcinterfaces.PluginNameBase)
 	if err != nil {
 		return nil, err
 	}
 
-	applicationPlugin := raw.(rpcinterfaces.PluginInfoInterface)
+	applicationPlugin := raw.(rpcinterfaces.PluginBaseInterface)
 	return applicationPlugin.Info()
 }
