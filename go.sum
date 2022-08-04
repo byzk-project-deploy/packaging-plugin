@@ -1,9 +1,9 @@
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/byzk-project-deploy/base-interface v0.0.0-20220804022718-5208191a4ff5 h1:C3Y2tith8IV1W/VUfjKAh0cIJYMTQMcMrtWsoxS4oGg=
-github.com/byzk-project-deploy/base-interface v0.0.0-20220804022718-5208191a4ff5/go.mod h1:tTeVfqD4M4HhrHDUHQocO66kFG5d3G+Yw9ztuLa7teY=
-github.com/byzk-project-deploy/base-interface v0.0.0-20220804032425-f99fb8b39ecc h1:Jz021Vkw9Zh5IwHHm0d3o+gWZB3CQ6V4/gZYizmSmio=
-github.com/byzk-project-deploy/base-interface v0.0.0-20220804032425-f99fb8b39ecc/go.mod h1:tTeVfqD4M4HhrHDUHQocO66kFG5d3G+Yw9ztuLa7teY=
+github.com/byzk-project-deploy/base-interface v0.0.0-20220804063912-57ae365061b1 h1:6blz8jYy35itxwpA+HYFwoxEaFpOMva0epuCWCfHGbI=
+github.com/byzk-project-deploy/base-interface v0.0.0-20220804063912-57ae365061b1/go.mod h1:bmx/9ng2LfMr4E906hksnXBqBJE/Sf7KusTRadJk0+U=
+github.com/byzk-project-deploy/go-plugin v0.0.0-20220804063707-b9a65653fc49 h1:yXyhx+34GtR2qYLdM3CZCFdRZ5T9cSBHhuOL+F1AkhE=
+github.com/byzk-project-deploy/go-plugin v0.0.0-20220804063707-b9a65653fc49/go.mod h1:q85Q8wMlHdh2G0mpwSPgnPwH+iC17lWgCjzk7BlIj1I=
 github.com/byzk-project-deploy/grumble v1.1.4-0.20220804013806-5f6dda51b769 h1:ighWPcnUHszk4g/lVEmpSymuiiZ6MDEb6TquB+TfOho=
 github.com/byzk-project-deploy/grumble v1.1.4-0.20220804013806-5f6dda51b769/go.mod h1:SRw9Ht7o521yNoOgnSiVpprir0x/ckBTqWf4dBRHELE=
 github.com/byzk-project-deploy/readline v1.5.2-0.20220803055751-5f5bd48126bb h1:mFb01O3I3QOS2T8r+cEgSMnz3fE9mCY5idnwkXs4KwM=
@@ -62,7 +62,6 @@ github.com/hashicorp/go-multierror v1.0.0/go.mod h1:dHtQlpGsu+cZNNAkkCN/P3hoUDHh
 github.com/hashicorp/go-multierror v1.1.0 h1:B9UzwGQJehnUY1yNrnwREHc3fGbC2xefo8g4TbElacI=
 github.com/hashicorp/go-multierror v1.1.0/go.mod h1:spPvp8C1qA32ftKqdAHm4hHTbPw+vmowP0z+KUhOZdA=
 github.com/hashicorp/go-plugin v1.4.4 h1:NVdrSdFRt3SkZtNckJ6tog7gbpRrcbOjQi/rgF7JYWQ=
-github.com/hashicorp/go-plugin v1.4.4/go.mod h1:viDMjcLJuDui6pXb8U4HVfb8AamCWhHGUjr2IrTF67s=
 github.com/hashicorp/yamux v0.0.0-20180604194846-3520598351bb h1:b5rjCoWHc7eqmAS4/qyk21ZsHyb6Mxv/jykxvNTkU4M=
 github.com/hashicorp/yamux v0.0.0-20180604194846-3520598351bb/go.mod h1:+NfK9FKeTrX5uv1uIXGdwYDTeHna2qgaIlx54MXqjAM=
 github.com/jhump/protoreflect v1.6.0 h1:h5jfMVslIg6l29nsMs0D8Wj17RDVdNYti0vDN/PZZoE=

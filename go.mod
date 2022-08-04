@@ -3,10 +3,10 @@ module github.com/byzk-project-deploy/packaging-plugin
 go 1.18
 
 require (
-	github.com/byzk-project-deploy/base-interface v0.0.0-20220804032425-f99fb8b39ecc
+	github.com/byzk-project-deploy/base-interface v0.0.0-20220804063912-57ae365061b1
+	github.com/byzk-project-deploy/go-plugin v0.0.0-20220804063707-b9a65653fc49
 	github.com/go-base-lib/coderutils v0.0.0-20220728101957-faf9884c898b
 	github.com/hashicorp/go-hclog v0.14.1
-	github.com/hashicorp/go-plugin v1.4.4
 	github.com/stretchr/testify v1.6.1
 )
 

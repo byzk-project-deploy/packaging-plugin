@@ -7,9 +7,10 @@ import (
 	"encoding/json"
 	"fmt"
 	rpcinterfaces "github.com/byzk-project-deploy/base-interface"
+	"github.com/byzk-project-deploy/go-plugin"
 	"github.com/go-base-lib/coderutils"
 	"github.com/hashicorp/go-hclog"
-	"github.com/hashicorp/go-plugin"
+	"github.com/tjfoc/gmsm/gmtls"
 	"io"
 	"io/ioutil"
 	"os"
@@ -57,7 +58,7 @@ func initOsAndArch() error {
 }
 
 // Packing 打包插件通过路径
-func Packing(src, target string) error {
+func Packing(src, target string, tlsConfig *gmtls.Config) error {
 
 	_ = os.RemoveAll(target)
 	targetDir := filepath.Dir(target)
@@ -69,7 +70,7 @@ func Packing(src, target string) error {
 	}
 	defer targetF.Close()
 
-	if err = PackingToWriteStream(src, targetF); err != nil {
+	if err = PackingToWriteStream(src, targetF, tlsConfig); err != nil {
 		_ = targetF.Close()
 		_ = os.RemoveAll(target)
 		return err
@@ -78,8 +79,8 @@ func Packing(src, target string) error {
 }
 
 // PackingToWriteStream 打包到输出路径
-func PackingToWriteStream(src string, target io.ReadWriteSeeker) error {
-	pluginInfo, err := getPluginInfoByPath(src)
+func PackingToWriteStream(src string, target io.ReadWriteSeeker, tlsConfig *gmtls.Config) error {
+	pluginInfo, err := getPluginInfoByPath(src, tlsConfig)
 	if err != nil {
 		return err
 	}
@@ -345,7 +346,7 @@ func readBytesByLen(r io.Reader, l int) (res []byte, err error) {
 }
 
 // getPluginInfoByPath 通过插件路径获取插件信息
-func getPluginInfoByPath(p string) (*rpcinterfaces.PluginInfo, error) {
+func getPluginInfoByPath(p string, tlsConfig *gmtls.Config) (*rpcinterfaces.PluginInfo, error) {
 	if _p, err := filepath.Abs(p); err != nil {
 		return nil, fmt.Errorf("获取插件文件的绝对路径失败: %s", err.Error())
 	} else {
@@ -362,6 +363,7 @@ func getPluginInfoByPath(p string) (*rpcinterfaces.PluginInfo, error) {
 		Stderr:          ioutil.Discard,
 		Plugins:         pluginMap,
 		Cmd:             exec.Command(p),
+		TLSConfig:       tlsConfig,
 	})
 	defer client.Kill()
 

@@ -21,7 +21,7 @@ func TestPackingAndUnpacking(t *testing.T) {
 	defer os.RemoveAll(targetFilePath)
 	defer os.RemoveAll(unpackingFilePath)
 
-	if err := Packing(srcFilePath, targetFilePath); !a.NoError(err) {
+	if err := Packing(srcFilePath, targetFilePath, nil); !a.NoError(err) {
 		return
 	}
 
@@ -44,7 +44,7 @@ func TestPackingAndUnpacking(t *testing.T) {
 		return
 	}
 
-	unpackPluginInfo, err := getPluginInfoByPath(unpackingFilePath)
+	unpackPluginInfo, err := getPluginInfoByPath(unpackingFilePath, nil)
 	if !a.NoError(err) {
 		return
 	}
