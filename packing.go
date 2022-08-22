@@ -12,7 +12,6 @@ import (
 	"github.com/hashicorp/go-hclog"
 	"github.com/tjfoc/gmsm/gmtls"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -360,7 +359,7 @@ func getPluginInfoByPath(p string, tlsConfig *gmtls.Config) (*rpcinterfaces.Plug
 	client := plugin.NewClient(&plugin.ClientConfig{
 		HandshakeConfig: *rpcinterfaces.DefaultHandshakeConfig,
 		Logger:          hclog.NewNullLogger(),
-		Stderr:          ioutil.Discard,
+		Stderr:          io.Discard,
 		Plugins:         pluginMap,
 		Cmd:             exec.Command(p),
 		TLSConfig:       tlsConfig,
